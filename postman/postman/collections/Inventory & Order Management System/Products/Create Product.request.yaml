@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/products/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Wireless Headphones",
+      "description": "Noise cancelling Bluetooth headphones",
+      "category_id": 1,
+      "price": "2999.00",
+      "sku": "EL-HP-001",
+      "stock_quantity": 50,
+      "status": "active",
+      "image": null
+    }
+order: 1000

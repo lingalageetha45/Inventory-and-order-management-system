@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/reviews/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "product_id": 1,
+      "order_id": 1,
+      "rating": 5,
+      "review": "Excellent product, fast delivery!"
+    }
+order: 1000

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.dependencies.auth import get_current_user, require_roles
-from app.enums.enums import UserRole
+from app.enums.enums import CategoryStatus, UserRole
 from app.models.user import User
 from app.schemas.category import (
     CategoryCreate,
@@ -33,7 +33,9 @@ def create_category(
 ):
     return category_service.create_category(
         db,
-        data,
+        name=data.name,
+        description=data.description,
+        category_status=data.status,
     )
 
 
@@ -42,10 +44,32 @@ def create_category(
     response_model=list[CategoryResponse],
 )
 def list_categories(
+    search: str | None = Query(
+        default=None,
+        max_length=100,
+    ),
+    status: CategoryStatus | None = Query(
+        default=None,
+    ),
+    skip: int = Query(
+        default=0,
+        ge=0,
+    ),
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+    ),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return category_service.get_categories(db)
+    return category_service.list_categories(
+        db,
+        search=search,
+        category_status=status,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get(
@@ -75,10 +99,14 @@ def update_category(
         require_roles(UserRole.ADMIN, UserRole.STAFF)
     ),
 ):
+    update_data = data.model_dump(
+        exclude_unset=True
+    )
+
     return category_service.update_category(
         db,
         category_id,
-        data,
+        update_data,
     )
 
 

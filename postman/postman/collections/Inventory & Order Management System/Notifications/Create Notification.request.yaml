@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/notifications/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "user_id": 1,
+      "title": "Order Update",
+      "message": "Your order has been confirmed."
+    }
+order: 1000

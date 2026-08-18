@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.dependencies.auth import get_current_user, require_roles
-from app.enums.enums import UserRole
+from app.enums.enums import UserRole, ProductStatus
 from app.models.user import User
 from app.schemas.product import (
     ProductCreate,
@@ -11,7 +11,6 @@ from app.schemas.product import (
     ProductUpdate,
 )
 from app.services import product as product_service
-from app.enums.enums import ProductStatus
 
 
 router = APIRouter(
@@ -83,7 +82,7 @@ def list_products(
         category_id=category_id,
         min_price=min_price,
         max_price=max_price,
-        status=status,
+        product_status=status,
         active_only=active_only,
         skip=skip,
         limit=limit,

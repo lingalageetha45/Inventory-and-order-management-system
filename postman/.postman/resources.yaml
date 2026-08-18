@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: 44a01d76-eb56-4ec5-8058-e110aa35f7e3
+
+localResources:
+  collections:
+    - ../Inventory_Order_Management.postman_collection.json
+
+cloudResources:
+  collections:
+    ../postman/collections/Inventory & Order Management System: 43f421b8-dd85-488b-b341-fa2264765744

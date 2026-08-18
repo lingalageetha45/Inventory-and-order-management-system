@@ -3,10 +3,11 @@ from decimal import Decimal
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.enums.enums import OrderStatus, ProductStatus
+from app.enums.enums import OrderStatus, ProductStatus, UserRole
 from app.models.inventory import Inventory
 from app.models.order import Order
 from app.models.order_item import OrderItem
+from app.models.user import User
 from app.repositories import order as order_repository
 from app.repositories import product as product_repository
 from app.schemas.order import OrderCreate
@@ -39,6 +40,32 @@ def list_orders(
     )
 
 
+def list_customer_orders(
+    db: Session,
+    customer_id: int,
+    skip: int = 0,
+    limit: int = 20,
+) -> list[Order]:
+    return order_repository.get_orders(
+        db,
+        customer_id=customer_id,
+        skip=skip,
+        limit=limit,
+    )
+
+
+def list_all_orders(
+    db: Session,
+    skip: int = 0,
+    limit: int = 20,
+) -> list[Order]:
+    return order_repository.get_orders(
+        db,
+        skip=skip,
+        limit=limit,
+    )
+
+
 def get_order(
     db: Session,
     order_id: int,
@@ -52,6 +79,32 @@ def get_order(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Order not found",
+        )
+
+    return order
+
+
+def get_order_for_user(
+    db: Session,
+    order_id: int,
+    current_user: User,
+) -> Order:
+    order = get_order(db, order_id)
+
+    if current_user.role == UserRole.CUSTOMER:
+        if order.customer_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to view this order",
+            )
+
+    elif current_user.role not in {
+        UserRole.ADMIN,
+        UserRole.STAFF,
+    }:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to view this order",
         )
 
     return order
@@ -106,9 +159,7 @@ def create_order(
             if not product:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=(
-                        f"Product {item_data.product_id} not found"
-                    ),
+                    detail=f"Product {item_data.product_id} not found",
                 )
 
             if product.status != ProductStatus.ACTIVE:
@@ -117,24 +168,23 @@ def create_order(
                     detail=f"Product {product.id} is inactive",
                 )
 
-            inventory = db.query(Inventory).filter(
-                Inventory.product_id == product.id
-            ).with_for_update().first()
+            inventory = (
+                db.query(Inventory)
+                .filter(Inventory.product_id == product.id)
+                .with_for_update()
+                .first()
+            )
 
             if not inventory:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=(
-                        f"Inventory not found for product {product.id}"
-                    ),
+                    detail=f"Inventory not found for product {product.id}",
                 )
 
             if inventory.current_stock < item_data.quantity:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=(
-                        f"Insufficient stock for product {product.id}"
-                    ),
+                    detail=f"Insufficient stock for product {product.id}",
                 )
 
             unit_price = Decimal(product.price)
@@ -151,7 +201,6 @@ def create_order(
             db.add(order_item)
 
             inventory.current_stock -= item_data.quantity
-
             product.stock_quantity = inventory.current_stock
 
             total_amount += subtotal
@@ -204,11 +253,65 @@ def update_order_status(
     return order
 
 
-def cancel_order(
+def confirm_order(
     db: Session,
     order_id: int,
 ) -> Order:
+    return update_order_status(
+        db,
+        order_id,
+        OrderStatus.CONFIRMED,
+    )
+
+
+def ship_order(
+    db: Session,
+    order_id: int,
+) -> Order:
+    return update_order_status(
+        db,
+        order_id,
+        OrderStatus.SHIPPED,
+    )
+
+
+def deliver_order(
+    db: Session,
+    order_id: int,
+) -> Order:
+    return update_order_status(
+        db,
+        order_id,
+        OrderStatus.DELIVERED,
+    )
+
+
+def cancel_order(
+    db: Session,
+    order_id: int,
+    current_user: User | None = None,
+) -> Order:
     order = get_order(db, order_id)
+
+    if current_user is not None:
+        if (
+            current_user.role == UserRole.CUSTOMER
+            and order.customer_id != current_user.id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to cancel this order",
+            )
+
+        if current_user.role not in {
+            UserRole.CUSTOMER,
+            UserRole.ADMIN,
+            UserRole.STAFF,
+        }:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to cancel this order",
+            )
 
     if order.status not in {
         OrderStatus.PENDING,
@@ -223,9 +326,12 @@ def cancel_order(
         )
 
     for item in order.items:
-        inventory = db.query(Inventory).filter(
-            Inventory.product_id == item.product_id
-        ).with_for_update().first()
+        inventory = (
+            db.query(Inventory)
+            .filter(Inventory.product_id == item.product_id)
+            .with_for_update()
+            .first()
+        )
 
         if inventory:
             inventory.current_stock += item.quantity
@@ -236,9 +342,7 @@ def cancel_order(
             )
 
             if product:
-                product.stock_quantity = (
-                    inventory.current_stock
-                )
+                product.stock_quantity = inventory.current_stock
 
     order.status = OrderStatus.CANCELLED
 

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/categories/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Electronics",
+      "description": "Electronic devices and accessories",
+      "status": "active"
+    }
+order: 1000

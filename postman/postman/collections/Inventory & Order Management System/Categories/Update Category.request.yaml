@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/categories/{{category_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Electronics Updated",
+      "description": "Updated description",
+      "status": "active"
+    }
+order: 4000

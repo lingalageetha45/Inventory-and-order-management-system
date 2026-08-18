@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/inventory/{{product_id}}/add-stock"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "quantity": 20
+    }
+order: 5000

@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/orders/{{order_id}}/cancel"
+method: PUT
+order: 7000

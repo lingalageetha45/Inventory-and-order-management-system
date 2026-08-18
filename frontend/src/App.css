@@ -1,25 +1,29 @@
-/* =========================
-   Product Actions
-========================= */
+/* =========================================================
+   App.css — product action buttons & small overrides
+   Keep imported after index.css
+   ========================================================= */
 
 .product-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .product-actions button {
   flex: 1;
+  min-width: 110px;
   border: none;
-  border-radius: 7px;
-  padding: 10px 14px;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
   font-weight: 600;
-  transition: 0.2s ease;
+  font-size: 0.875rem;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .edit-button {
   background: #2563eb;
-  color: white;
+  color: #fff;
 }
 
 .edit-button:hover {
@@ -36,34 +40,26 @@
 }
 
 .cancel-button {
-  grid-column: 2;
-  border: 1px solid #d5dbe5 !important;
+  border: 1px solid #e2e8f0 !important;
   background: #f8fafc !important;
-  color: #374151 !important;
+  color: #334155 !important;
 }
 
 .cancel-button:hover {
-  background: #eef2f7 !important;
+  background: #f1f5f9 !important;
 }
 
-.admin-product-image {
-  width: 100%;
-  height: 190px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 14px;
-  display: block;
+.product-card:hover .edit-button,
+.product-card:hover .delete-button {
+  transform: translateY(-1px);
 }
 
-.product-image-placeholder {
-  width: 100%;
-  height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f5f9;
-  border-radius: 8px;
-  margin-bottom: 14px;
+.admin-content > p,
+.customer-content > p {
   color: #64748b;
-  font-size: 14px;
+}
+
+.product-card p,
+.category-card p {
+  word-break: break-word;
 }

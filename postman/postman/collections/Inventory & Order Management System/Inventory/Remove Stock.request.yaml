@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/inventory/{{product_id}}/remove-stock"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "quantity": 5
+    }
+order: 6000
