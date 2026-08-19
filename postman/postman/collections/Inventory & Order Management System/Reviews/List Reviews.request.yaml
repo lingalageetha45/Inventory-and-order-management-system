@@ -1,6 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/reviews/?product_id=1"
-method: GET
-queryParams:
-  product_id: "1"
-order: 2000

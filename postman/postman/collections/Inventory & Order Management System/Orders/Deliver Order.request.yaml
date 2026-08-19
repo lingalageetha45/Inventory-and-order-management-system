@@ -1,4 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/orders/{{order_id}}/deliver"
-method: PUT
-order: 6000
