@@ -7,6 +7,7 @@ import {
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+
 import Products from "../pages/Products";
 import Checkout from "../pages/Checkout";
 import Orders from "../pages/Orders";
@@ -22,10 +23,19 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* =====================================================
+            DEFAULT
+        ===================================================== */}
+
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
         />
+
+        {/* =====================================================
+            AUTHENTICATION
+        ===================================================== */}
 
         <Route
           path="/login"
@@ -37,7 +47,10 @@ function AppRoutes() {
           element={<Register />}
         />
 
-        {/* Customer */}
+        {/* =====================================================
+            CUSTOMER
+        ===================================================== */}
+
         <Route
           path="/products"
           element={<Products />}
@@ -53,7 +66,10 @@ function AppRoutes() {
           element={<Orders />}
         />
 
-        {/* Admin */}
+        {/* =====================================================
+            ADMIN
+        ===================================================== */}
+
         <Route
           path="/admin"
           element={<AdminDashboard />}
@@ -84,11 +100,49 @@ function AppRoutes() {
           element={<AdminPayments />}
         />
 
-        {/* Unknown routes */}
+        {/* =====================================================
+            STAFF
+        ===================================================== */}
+
+        <Route
+          path="/staff"
+          element={<AdminDashboard />}
+        />
+
+        <Route
+          path="/staff/products"
+          element={<AdminProducts />}
+        />
+
+        <Route
+          path="/staff/categories"
+          element={<AdminCategories />}
+        />
+
+        <Route
+          path="/staff/inventory"
+          element={<AdminInventory />}
+        />
+
+        <Route
+          path="/staff/orders"
+          element={<AdminOrders />}
+        />
+
+        <Route
+          path="/staff/payments"
+          element={<AdminPayments />}
+        />
+
+        {/* =====================================================
+            UNKNOWN ROUTES
+        ===================================================== */}
+
         <Route
           path="*"
           element={<Navigate to="/login" replace />}
         />
+
       </Routes>
     </BrowserRouter>
   );

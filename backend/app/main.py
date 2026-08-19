@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     payments,
     reviews,
     notifications,
+    dashboard,
 )
 
 app = FastAPI(
@@ -40,3 +41,4 @@ app.include_router(orders.router, prefix="/api/v1")
 app.include_router(payments.router, prefix="/api/v1")
 app.include_router(reviews.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
